@@ -1,4 +1,18 @@
 <script lang="ts">
+  enum CharacterClass {
+    HUNTER,
+    WARLOCK,
+    TITAN,
+  }
+
+  enum ActivityIdentifier {
+    PRESAGE,
+    HARBINGER,
+    SHATTERED_THRONE,
+    PIT_OF_HERESY,
+    PROPHECY,
+  }
+
   type ActivityDefinition = {
     id: ActivityIdentifier;
     order: number;
@@ -13,15 +27,7 @@
     note?: string;
   };
 
-  enum ActivityIdentifier {
-    PRESAGE,
-    HARBINGER,
-    SHATTERED_THRONE,
-    PIT_OF_HERESY,
-    PROPHECY,
-  }
-
-  const activities: ActivityDefinition[] = [
+  const ActivityState: ActivityDefinition[] = [
     {
       id: ActivityIdentifier.PRESAGE,
       order: 1,
@@ -48,29 +54,105 @@
       name: "Prophecy",
     },
   ];
+
+  const handleToggleActivity = (
+    character: CharacterClass,
+    activity: ActivityIdentifier
+  ) => {
+    const theActivity = ActivityState.find(
+      (singleActivity) => singleActivity.id === activity
+    );
+    const activityClone = { ...theActivity };
+    switch (character) {
+      case CharacterClass.HUNTER:
+        const previousHunterActivated = activityClone.hunterDef?.isActivated;
+        const changedHunterActivity: ActivityDefinition = {
+          ...activityClone,
+          hunterDef: {
+            ...activityClone.hunterDef,
+            isActivated: !previousHunterActivated,
+          },
+        };
+        ActivityState[activity] = changedHunterActivity;
+        return;
+      case CharacterClass.WARLOCK:
+        const previousWarlockActivated = activityClone.warlockDef?.isActivated;
+        const changedWarlockActivity: ActivityDefinition = {
+          ...activityClone,
+          warlockDef: {
+            ...activityClone.warlockDef,
+            isActivated: !previousWarlockActivated,
+          },
+        };
+        ActivityState[activity] = changedWarlockActivity;
+        return;
+      case CharacterClass.TITAN:
+        const previousTitanActivated = activityClone.titanDef?.isActivated;
+        const changedTitanActivity: ActivityDefinition = {
+          ...activityClone,
+          titanDef: {
+            ...activityClone.titanDef,
+            isActivated: !previousTitanActivated,
+          },
+        };
+        ActivityState[activity] = changedTitanActivity;
+        return;
+      default:
+        return;
+    }
+  };
 </script>
 
 <header>My week in Destiny</header>
 
 <main>
-  <section>
-    <div class="section-header">Hunter</div>
-    {#each activities as activity}
-      <div>{activity.name}</div>
-    {/each}
+  <section class="section-header">
+    <div>Hunter</div>
+    <div>Warlock</div>
+    <div>Titan</div>
   </section>
-  <section>
-    <div class="section-header">Titan</div>
-    {#each activities as activity}
-      <div>{activity.name}</div>
+  <div>
+    {#each ActivityState as activity}
+      <section>
+        <div>
+          {#if activity?.hunterDef?.isActivated}
+            LETS GO, ITS ACTIVE
+          {/if}
+          {activity.name}
+          <button
+            on:click={() =>
+              handleToggleActivity(CharacterClass.HUNTER, activity.id)}
+          >
+            Activate Hunter!
+          </button>
+        </div>
+        <div>
+          {#if activity?.warlockDef?.isActivated}
+            LETS GO, ITS ACTIVE
+          {/if}
+          {activity.name}
+          <button
+            on:click={() =>
+              handleToggleActivity(CharacterClass.WARLOCK, activity.id)}
+          >
+            Activate Warlock!
+          </button>
+        </div>
+        <div>
+          {#if activity?.titanDef?.isActivated}
+            LETS GO, ITS ACTIVE
+          {/if}
+          {activity.name}
+          <button
+            on:click={() =>
+              handleToggleActivity(CharacterClass.TITAN, activity.id)}
+          >
+            Activate Titan!
+          </button>
+        </div>
+      </section>
     {/each}
-  </section>
-  <section>
-    <div class="section-header">Warlock</div>
-    {#each activities as activity}
-      <div>{activity.name}</div>
-    {/each}
-  </section>
+  </div>
 </main>
 
 <style>
@@ -82,21 +164,20 @@
   }
 
   main {
-    display: flex;
-    flex-direction: row;
     padding: 1rem;
     margin: 0 auto;
   }
 
   section {
-    display: inline-block;
-    width: 33%;
-    text-align: center;
+    display: flex;
+    flex-direction: row;
   }
 
   section > * {
     display: block;
     padding: 0.75rem;
+    width: 33%;
+    text-align: center;
   }
 
   .section-header {
