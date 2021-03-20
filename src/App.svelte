@@ -1,105 +1,64 @@
 <script lang="ts">
-  enum CharacterClass {
-    HUNTER,
-    WARLOCK,
-    TITAN,
-  }
+  import type { ActivityDefinition, ActivityIdentifier } from "./types";
+  import { CharacterClass } from "./types";
+  import { weeklyState } from "./weeklyState";
 
-  enum ActivityIdentifier {
-    PRESAGE,
-    HARBINGER,
-    SHATTERED_THRONE,
-    PIT_OF_HERESY,
-    PROPHECY,
-  }
+  let weekly_value: ActivityDefinition[];
 
-  type ActivityDefinition = {
-    id: ActivityIdentifier;
-    order: number;
-    name: string;
-    hunterDef?: CharacterActivityDefinition;
-    warlockDef?: CharacterActivityDefinition;
-    titanDef?: CharacterActivityDefinition;
-  };
-
-  type CharacterActivityDefinition = {
-    isActivated?: boolean;
-    note?: string;
-  };
-
-  const ActivityState: ActivityDefinition[] = [
-    {
-      id: ActivityIdentifier.PRESAGE,
-      order: 1,
-      name: "Presage",
-    },
-    {
-      id: ActivityIdentifier.HARBINGER,
-      order: 2,
-      name: "Harbinger",
-    },
-    {
-      id: ActivityIdentifier.SHATTERED_THRONE,
-      order: 3,
-      name: "Shattered Throne",
-    },
-    {
-      id: ActivityIdentifier.PIT_OF_HERESY,
-      order: 4,
-      name: "Pit of Heresy",
-    },
-    {
-      id: ActivityIdentifier.PROPHECY,
-      order: 5,
-      name: "Prophecy",
-    },
-  ];
+  const unsubscribe = weeklyState.subscribe((value) => {
+    weekly_value = value;
+  });
 
   const handleToggleActivity = (
     character: CharacterClass,
     activity: ActivityIdentifier
   ) => {
-    const theActivity = ActivityState.find(
+    const theActivity = weekly_value.find(
       (singleActivity) => singleActivity.id === activity
     );
-    const activityClone = { ...theActivity };
+    let newActivityDefinition: ActivityDefinition;
     switch (character) {
       case CharacterClass.HUNTER:
-        const previousHunterActivated = activityClone.hunterDef?.isActivated;
-        const changedHunterActivity: ActivityDefinition = {
-          ...activityClone,
+        const previousHunterActivated = theActivity.hunterDef?.isActivated;
+        newActivityDefinition = {
+          ...theActivity,
           hunterDef: {
-            ...activityClone.hunterDef,
+            ...theActivity.hunterDef,
             isActivated: !previousHunterActivated,
           },
         };
-        ActivityState[activity] = changedHunterActivity;
-        return;
+        break;
       case CharacterClass.WARLOCK:
-        const previousWarlockActivated = activityClone.warlockDef?.isActivated;
-        const changedWarlockActivity: ActivityDefinition = {
-          ...activityClone,
+        const previousWarlockActivated = theActivity.warlockDef?.isActivated;
+        newActivityDefinition = {
+          ...theActivity,
           warlockDef: {
-            ...activityClone.warlockDef,
+            ...theActivity.warlockDef,
             isActivated: !previousWarlockActivated,
           },
         };
-        ActivityState[activity] = changedWarlockActivity;
-        return;
+        break;
       case CharacterClass.TITAN:
-        const previousTitanActivated = activityClone.titanDef?.isActivated;
-        const changedTitanActivity: ActivityDefinition = {
-          ...activityClone,
+        const previousTitanActivated = theActivity.titanDef?.isActivated;
+        newActivityDefinition = {
+          ...theActivity,
           titanDef: {
-            ...activityClone.titanDef,
+            ...theActivity.titanDef,
             isActivated: !previousTitanActivated,
           },
         };
-        ActivityState[activity] = changedTitanActivity;
-        return;
+        break;
       default:
-        return;
+        newActivityDefinition = { ...theActivity };
     }
+    const newWeeklyState = weekly_value.map((singleActivity) => {
+      if (singleActivity.id === activity) {
+        return newActivityDefinition;
+      } else {
+        return { ...singleActivity };
+      }
+    });
+    weeklyState.set(newWeeklyState);
   };
 </script>
 
@@ -112,7 +71,7 @@
     <div>Titan</div>
   </section>
   <div>
-    {#each ActivityState as activity}
+    {#each weekly_value as activity}
       <section>
         <div>
           {#if activity?.hunterDef?.isActivated}
