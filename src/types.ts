@@ -12,16 +12,18 @@ export enum ActivityIdentifier {
   PROPHECY,
 }
 
-export type ActivityDefinition = {
+export type CharacterActivityDefinition = {
+  class: CharacterClass;
+  isActivated?: boolean;
+  note?: string;
+};
+
+export type CharacterActivityDefinitions = {
+  [key in CharacterClass]?: CharacterActivityDefinition;
+};
+
+export type ActivityDefinition = CharacterActivityDefinitions & {
   id: ActivityIdentifier;
   order: number;
   name: string;
-  hunterDef?: CharacterActivityDefinition;
-  warlockDef?: CharacterActivityDefinition;
-  titanDef?: CharacterActivityDefinition;
-};
-
-export type CharacterActivityDefinition = {
-  isActivated?: boolean;
-  note?: string;
 };

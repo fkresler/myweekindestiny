@@ -29,33 +29,33 @@
         <div>
           <ActivityTile
             id={`tile-hunter-${activity.id}`}
-            characterData={activity.hunterDef}
+            characterData={activity[CharacterClass.HUNTER]}
             on:toggleActivity={() =>
               toggleActivityByClass({
                 character: CharacterClass.HUNTER,
-                activity: activity.id,
+                activities: [activity.id],
               })}
           />
         </div>
         <div>
           <ActivityTile
             id={`tile-warlock-${activity.id}`}
-            characterData={activity.warlockDef}
+            characterData={activity[CharacterClass.WARLOCK]}
             on:toggleActivity={() =>
               toggleActivityByClass({
                 character: CharacterClass.WARLOCK,
-                activity: activity.id,
+                activities: [activity.id],
               })}
           />
         </div>
         <div>
           <ActivityTile
             id={`tile-titan-${activity.id}`}
-            characterData={activity.titanDef}
+            characterData={activity[CharacterClass.TITAN]}
             on:toggleActivity={() => {
               toggleActivityByClass({
                 character: CharacterClass.TITAN,
-                activity: activity.id,
+                activities: [activity.id],
               });
             }}
           />

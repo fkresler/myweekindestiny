@@ -45,53 +45,21 @@ const createWeeklyState = () => {
 
   const toggleActivityByClass = ({
     character,
-    activity,
+    activities,
   }: {
     character: CharacterClass;
-    activity: ActivityIdentifier;
+    activities: ActivityIdentifier[];
   }) =>
     update((prevState) => {
-      const theActivity = prevState.find(
-        (singleActivity) => singleActivity.id === activity
-      );
-      let newActivityDefinition: ActivityDefinition;
-      switch (character) {
-        case CharacterClass.HUNTER:
-          const previousHunterActivated = theActivity.hunterDef?.isActivated;
-          newActivityDefinition = {
-            ...theActivity,
-            hunterDef: {
-              ...theActivity.hunterDef,
-              isActivated: !previousHunterActivated,
-            },
-          };
-          break;
-        case CharacterClass.WARLOCK:
-          const previousWarlockActivated = theActivity.warlockDef?.isActivated;
-          newActivityDefinition = {
-            ...theActivity,
-            warlockDef: {
-              ...theActivity.warlockDef,
-              isActivated: !previousWarlockActivated,
-            },
-          };
-          break;
-        case CharacterClass.TITAN:
-          const previousTitanActivated = theActivity.titanDef?.isActivated;
-          newActivityDefinition = {
-            ...theActivity,
-            titanDef: {
-              ...theActivity.titanDef,
-              isActivated: !previousTitanActivated,
-            },
-          };
-          break;
-        default:
-          newActivityDefinition = { ...theActivity };
-      }
       const newWeeklyState = prevState.map((singleActivity) => {
-        if (singleActivity.id === activity) {
-          return newActivityDefinition;
+        if (activities.includes(singleActivity.id)) {
+          return {
+            ...singleActivity,
+            [character]: {
+              ...singleActivity[character],
+              isActivated: !singleActivity[character]?.isActivated,
+            },
+          };
         } else {
           return { ...singleActivity };
         }
