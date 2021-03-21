@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ActivityTile from "./ActivityTile.svelte";
   import type { ActivityDefinition, ActivityIdentifier } from "./types";
   import { CharacterClass } from "./types";
   import { weeklyState } from "./weeklyState";
@@ -66,6 +67,7 @@
 
 <main>
   <section class="section-header">
+    <div>Activity</div>
     <div>Hunter</div>
     <div>Warlock</div>
     <div>Titan</div>
@@ -73,41 +75,28 @@
   <div>
     {#each weekly_value as activity}
       <section>
+        <div>{activity.name}</div>
         <div>
-          {#if activity?.hunterDef?.isActivated}
-            LETS GO, ITS ACTIVE
-          {/if}
-          {activity.name}
-          <button
-            on:click={() =>
+          <ActivityTile
+            characterData={activity.hunterDef}
+            on:toggleActivity={() =>
               handleToggleActivity(CharacterClass.HUNTER, activity.id)}
-          >
-            Activate Hunter!
-          </button>
+          />
         </div>
         <div>
-          {#if activity?.warlockDef?.isActivated}
-            LETS GO, ITS ACTIVE
-          {/if}
-          {activity.name}
-          <button
-            on:click={() =>
+          <ActivityTile
+            characterData={activity.warlockDef}
+            on:toggleActivity={() =>
               handleToggleActivity(CharacterClass.WARLOCK, activity.id)}
-          >
-            Activate Warlock!
-          </button>
+          />
         </div>
         <div>
-          {#if activity?.titanDef?.isActivated}
-            LETS GO, ITS ACTIVE
-          {/if}
-          {activity.name}
-          <button
-            on:click={() =>
-              handleToggleActivity(CharacterClass.TITAN, activity.id)}
-          >
-            Activate Titan!
-          </button>
+          <ActivityTile
+            characterData={activity.titanDef}
+            on:toggleActivity={() => {
+              handleToggleActivity(CharacterClass.TITAN, activity.id);
+            }}
+          />
         </div>
       </section>
     {/each}
@@ -135,7 +124,7 @@
   section > * {
     display: block;
     padding: 0.75rem;
-    width: 33%;
+    width: 25%;
     text-align: center;
   }
 
