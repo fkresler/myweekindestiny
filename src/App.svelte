@@ -1,66 +1,16 @@
 <script lang="ts">
   import ActivityTile from "./ActivityTile.svelte";
-  import type { ActivityDefinition, ActivityIdentifier } from "./types";
+  import type { ActivityDefinition } from "./types";
   import { CharacterClass } from "./types";
   import { weeklyState } from "./weeklyState";
 
   let weekly_value: ActivityDefinition[];
 
-  const unsubscribe = weeklyState.subscribe((value) => {
+  const { subscribe, toggleActivityByClass } = weeklyState;
+
+  const unsubscribe = subscribe((value) => {
     weekly_value = value;
   });
-
-  const handleToggleActivity = (
-    character: CharacterClass,
-    activity: ActivityIdentifier
-  ) => {
-    const theActivity = weekly_value.find(
-      (singleActivity) => singleActivity.id === activity
-    );
-    let newActivityDefinition: ActivityDefinition;
-    switch (character) {
-      case CharacterClass.HUNTER:
-        const previousHunterActivated = theActivity.hunterDef?.isActivated;
-        newActivityDefinition = {
-          ...theActivity,
-          hunterDef: {
-            ...theActivity.hunterDef,
-            isActivated: !previousHunterActivated,
-          },
-        };
-        break;
-      case CharacterClass.WARLOCK:
-        const previousWarlockActivated = theActivity.warlockDef?.isActivated;
-        newActivityDefinition = {
-          ...theActivity,
-          warlockDef: {
-            ...theActivity.warlockDef,
-            isActivated: !previousWarlockActivated,
-          },
-        };
-        break;
-      case CharacterClass.TITAN:
-        const previousTitanActivated = theActivity.titanDef?.isActivated;
-        newActivityDefinition = {
-          ...theActivity,
-          titanDef: {
-            ...theActivity.titanDef,
-            isActivated: !previousTitanActivated,
-          },
-        };
-        break;
-      default:
-        newActivityDefinition = { ...theActivity };
-    }
-    const newWeeklyState = weekly_value.map((singleActivity) => {
-      if (singleActivity.id === activity) {
-        return newActivityDefinition;
-      } else {
-        return { ...singleActivity };
-      }
-    });
-    weeklyState.set(newWeeklyState);
-  };
 </script>
 
 <header>My week in Destiny</header>
@@ -78,23 +28,35 @@
         <div>{activity.name}</div>
         <div>
           <ActivityTile
+            id={`tile-hunter-${activity.id}`}
             characterData={activity.hunterDef}
             on:toggleActivity={() =>
-              handleToggleActivity(CharacterClass.HUNTER, activity.id)}
+              toggleActivityByClass({
+                character: CharacterClass.HUNTER,
+                activity: activity.id,
+              })}
           />
         </div>
         <div>
           <ActivityTile
+            id={`tile-warlock-${activity.id}`}
             characterData={activity.warlockDef}
             on:toggleActivity={() =>
-              handleToggleActivity(CharacterClass.WARLOCK, activity.id)}
+              toggleActivityByClass({
+                character: CharacterClass.WARLOCK,
+                activity: activity.id,
+              })}
           />
         </div>
         <div>
           <ActivityTile
+            id={`tile-titan-${activity.id}`}
             characterData={activity.titanDef}
             on:toggleActivity={() => {
-              handleToggleActivity(CharacterClass.TITAN, activity.id);
+              toggleActivityByClass({
+                character: CharacterClass.TITAN,
+                activity: activity.id,
+              });
             }}
           />
         </div>
