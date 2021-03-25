@@ -33,7 +33,7 @@
             on:toggleActivity={() =>
               toggleActivityByClass({
                 character: CharacterClass.HUNTER,
-                activities: [activity.id],
+                activity: activity.id,
               })}
           />
         </div>
@@ -44,7 +44,7 @@
             on:toggleActivity={() =>
               toggleActivityByClass({
                 character: CharacterClass.WARLOCK,
-                activities: [activity.id],
+                activity: activity.id,
               })}
           />
         </div>
@@ -55,7 +55,7 @@
             on:toggleActivity={() => {
               toggleActivityByClass({
                 character: CharacterClass.TITAN,
-                activities: [activity.id],
+                activity: activity.id,
               });
             }}
           />

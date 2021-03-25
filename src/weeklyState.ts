@@ -2,6 +2,7 @@ import { writable } from "svelte/store";
 import {
   ActivityDefinition,
   ActivityIdentifier,
+  ActivityPlanningState,
   CharacterClass,
 } from "./types";
 
@@ -40,15 +41,59 @@ const parsedWeeklyState = storedWeeklyState
   ? (JSON.parse(storedWeeklyState) as ActivityDefinition[])
   : defaultActivityState;
 
+const getNextPlanningState = (state: ActivityPlanningState) => {
+  switch (state) {
+    case ActivityPlanningState.UNDEFINED:
+      return ActivityPlanningState.PLANNED;
+    case ActivityPlanningState.PLANNED:
+      return ActivityPlanningState.DONE;
+    case ActivityPlanningState.DONE:
+      return ActivityPlanningState.DONTCARE;
+    case ActivityPlanningState.DONTCARE:
+      return ActivityPlanningState.PLANNED;
+    default:
+      return ActivityPlanningState.UNDEFINED;
+  }
+};
+
 const createWeeklyState = () => {
   const { subscribe, update } = writable(parsedWeeklyState);
 
   const toggleActivityByClass = ({
     character,
+    activity,
+  }: {
+    character: CharacterClass;
+    activity: ActivityIdentifier;
+  }) =>
+    update((prevState) => {
+      const newWeeklyState = prevState.map((singleActivity) => {
+        if (singleActivity.id === activity) {
+          const previousPlanningState =
+            singleActivity[character]?.planningState ||
+            ActivityPlanningState.UNDEFINED;
+          return {
+            ...singleActivity,
+            [character]: {
+              ...singleActivity[character],
+              planningState: getNextPlanningState(previousPlanningState),
+            },
+          };
+        } else {
+          return { ...singleActivity };
+        }
+      });
+      return newWeeklyState;
+    });
+
+  const setPlanningStateByClassActivities = ({
+    character,
     activities,
+    state = ActivityPlanningState.UNDEFINED,
   }: {
     character: CharacterClass;
     activities: ActivityIdentifier[];
+    state: ActivityPlanningState;
   }) =>
     update((prevState) => {
       const newWeeklyState = prevState.map((singleActivity) => {
@@ -57,7 +102,7 @@ const createWeeklyState = () => {
             ...singleActivity,
             [character]: {
               ...singleActivity[character],
-              isActivated: !singleActivity[character]?.isActivated,
+              planningState: state,
             },
           };
         } else {
@@ -70,6 +115,7 @@ const createWeeklyState = () => {
   return {
     subscribe,
     toggleActivityByClass,
+    setPlanningStateByClassActivities,
   };
 };
 

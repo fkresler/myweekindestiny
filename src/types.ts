@@ -12,9 +12,16 @@ export enum ActivityIdentifier {
   PROPHECY,
 }
 
+export enum ActivityPlanningState {
+  UNDEFINED,
+  DONTCARE,
+  PLANNED,
+  DONE,
+}
+
 export type CharacterActivityDefinition = {
   class: CharacterClass;
-  isActivated?: boolean;
+  planningState: ActivityPlanningState;
   note?: string;
 };
 
