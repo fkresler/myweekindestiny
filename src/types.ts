@@ -4,12 +4,13 @@ export enum CharacterClass {
   TITAN,
 }
 
-export enum ActivityIdentifier {
-  PRESAGE,
-  HARBINGER,
-  SHATTERED_THRONE,
-  PIT_OF_HERESY,
-  PROPHECY,
+export enum ActivityType {
+  DUNGEON,
+  RAID,
+  SEASONAL,
+  PATROL,
+  VENDOR,
+  CUSTOM,
 }
 
 export enum ActivityPlanningState {
@@ -30,7 +31,8 @@ export type CharacterActivityDefinitions = {
 };
 
 export type ActivityDefinition = CharacterActivityDefinitions & {
-  id: ActivityIdentifier;
+  id: string;
   order: number;
   name: string;
+  type: ActivityType;
 };

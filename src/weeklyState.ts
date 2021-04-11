@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import {
+  ActivityType,
   ActivityDefinition,
-  ActivityIdentifier,
   ActivityPlanningState,
   CharacterClass,
 } from "./types";
@@ -10,29 +10,34 @@ const MY_WEEKLY_STORAGE_KEY = "myweekindestiny";
 
 const defaultActivityState: ActivityDefinition[] = [
   {
-    id: ActivityIdentifier.PRESAGE,
+    id: "PRESAGE",
     order: 1,
     name: "Presage",
+    type: ActivityType.DUNGEON,
   },
   {
-    id: ActivityIdentifier.HARBINGER,
+    id: "HARBINGER",
     order: 2,
     name: "Harbinger",
+    type: ActivityType.DUNGEON,
   },
   {
-    id: ActivityIdentifier.SHATTERED_THRONE,
+    id: "SHATTEREDTHRONE",
     order: 3,
     name: "Shattered Throne",
+    type: ActivityType.DUNGEON,
   },
   {
-    id: ActivityIdentifier.PIT_OF_HERESY,
+    id: "PITOFHERESY",
     order: 4,
     name: "Pit of Heresy",
+    type: ActivityType.DUNGEON,
   },
   {
-    id: ActivityIdentifier.PROPHECY,
+    id: "PROPHECY",
     order: 5,
     name: "Prophecy",
+    type: ActivityType.DUNGEON,
   },
 ];
 
@@ -59,16 +64,16 @@ const getNextPlanningState = (state: ActivityPlanningState) => {
 const createWeeklyState = () => {
   const { subscribe, update } = writable(parsedWeeklyState);
 
-  const toggleActivityByClass = ({
+  const toggleActivity = ({
     character,
     activity,
   }: {
     character: CharacterClass;
-    activity: ActivityIdentifier;
+    activity: string;
   }) =>
     update((prevState) => {
       const newWeeklyState = prevState.map((singleActivity) => {
-        if (singleActivity.id === activity) {
+        if (singleActivity.name === activity) {
           const previousPlanningState =
             singleActivity[character]?.planningState ||
             ActivityPlanningState.UNDEFINED;
@@ -86,36 +91,29 @@ const createWeeklyState = () => {
       return newWeeklyState;
     });
 
-  const setPlanningStateByClassActivities = ({
-    character,
-    activities,
-    state = ActivityPlanningState.UNDEFINED,
-  }: {
-    character: CharacterClass;
-    activities: ActivityIdentifier[];
-    state: ActivityPlanningState;
-  }) =>
+  const addActivity = ({ name }: { name: string }) => {
     update((prevState) => {
-      const newWeeklyState = prevState.map((singleActivity) => {
-        if (activities.includes(singleActivity.id)) {
-          return {
-            ...singleActivity,
-            [character]: {
-              ...singleActivity[character],
-              planningState: state,
-            },
-          };
-        } else {
-          return { ...singleActivity };
-        }
-      });
-      return newWeeklyState;
+      const newActivity: ActivityDefinition = {
+        id: Date.now().toString(),
+        order: prevState.length,
+        name,
+        type: ActivityType.CUSTOM,
+      };
+      return [...prevState, newActivity];
     });
+  };
+
+  const removeActivity = ({ id }: { id: string }) => {
+    update((prevState) => {
+      return prevState.filter((activity) => activity.id !== id);
+    });
+  };
 
   return {
     subscribe,
-    toggleActivityByClass,
-    setPlanningStateByClassActivities,
+    toggleActivity,
+    addActivity,
+    removeActivity,
   };
 };
 

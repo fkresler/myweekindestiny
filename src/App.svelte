@@ -1,12 +1,13 @@
 <script lang="ts">
   import ActivityTile from "./ActivityTile.svelte";
+  import AddActivity from "./AddActivity.svelte";
   import type { ActivityDefinition } from "./types";
   import { CharacterClass } from "./types";
   import { weeklyState } from "./weeklyState";
 
   let weekly_value: ActivityDefinition[];
 
-  const { subscribe, toggleActivityByClass } = weeklyState;
+  const { subscribe, toggleActivity, removeActivity } = weeklyState;
 
   const unsubscribe = subscribe((value) => {
     weekly_value = value;
@@ -16,24 +17,29 @@
 <header>My week in Destiny</header>
 
 <main>
-  <section class="section-header">
+  <section class="section-header table-row">
     <div>Activity</div>
     <div>Hunter</div>
     <div>Warlock</div>
     <div>Titan</div>
   </section>
-  <div>
+  <section>
     {#each weekly_value as activity}
-      <section>
-        <div>{activity.name}</div>
+      <div class="table-row">
+        <div>
+          <span>{activity.name}</span>
+          <button on:click={() => removeActivity({ id: activity.id })}
+            >Remove</button
+          >
+        </div>
         <div>
           <ActivityTile
             id={`tile-hunter-${activity.id}`}
             characterData={activity[CharacterClass.HUNTER]}
             on:toggleActivity={() =>
-              toggleActivityByClass({
+              toggleActivity({
                 character: CharacterClass.HUNTER,
-                activity: activity.id,
+                activity: activity.name,
               })}
           />
         </div>
@@ -42,9 +48,9 @@
             id={`tile-warlock-${activity.id}`}
             characterData={activity[CharacterClass.WARLOCK]}
             on:toggleActivity={() =>
-              toggleActivityByClass({
+              toggleActivity({
                 character: CharacterClass.WARLOCK,
-                activity: activity.id,
+                activity: activity.name,
               })}
           />
         </div>
@@ -53,16 +59,19 @@
             id={`tile-titan-${activity.id}`}
             characterData={activity[CharacterClass.TITAN]}
             on:toggleActivity={() => {
-              toggleActivityByClass({
+              toggleActivity({
                 character: CharacterClass.TITAN,
-                activity: activity.id,
+                activity: activity.name,
               });
             }}
           />
         </div>
-      </section>
+      </div>
     {/each}
-  </div>
+  </section>
+  <section>
+    <AddActivity />
+  </section>
 </main>
 
 <style>
@@ -78,12 +87,12 @@
     margin: 0 auto;
   }
 
-  section {
+  .table-row {
     display: flex;
     flex-direction: row;
   }
 
-  section > * {
+  .table-row > * {
     display: block;
     padding: 0.75rem;
     width: 25%;
